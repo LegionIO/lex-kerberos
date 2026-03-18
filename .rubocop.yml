@@ -8,5 +8,8 @@ Metrics/BlockLength:
     - 'spec/**/*'
     - '*.gemspec'
 
+Metrics/ParameterLists:
+  Max: 10
+
 Style/Documentation:
   Enabled: false
