@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-03-18
+
+### Added
+- Organizational LDAP attributes: `title`, `department`, `company`, `co`, `c`, `l`, `st`, `cn`, `whenCreated`
+- `PROFILE_MAP` constant maps LDAP attribute names to readable Ruby symbols
+
+### Changed
+- `USER_ATTRIBUTES` expanded to include organizational fields
+- `extract_profile` uses `PROFILE_MAP` for declarative attribute mapping
+
 ## [0.1.1] - 2026-03-18
 
 ### Added

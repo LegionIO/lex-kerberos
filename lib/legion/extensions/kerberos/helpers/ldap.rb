@@ -7,7 +7,16 @@ module Legion
     module Kerberos
       module Helpers
         module Ldap
-          USER_ATTRIBUTES = %w[memberOf givenName sn mail displayName].freeze
+          USER_ATTRIBUTES = %w[
+            memberOf givenName sn mail displayName cn
+            title department company co c l st whenCreated
+          ].freeze
+
+          PROFILE_MAP = {
+            first_name: :givenname, last_name: :sn, email: :mail, display_name: :displayname,
+            cn: :cn, title: :title, department: :department, company: :company,
+            country: :co, country_code: :c, city: :l, state: :st, ad_created_at: :whencreated
+          }.freeze
 
           def lookup_groups(username:, host:, base_dn:, bind_dn:, bind_password:,
                             port: 636, encryption: :simple_tls,
@@ -45,9 +54,7 @@ module Legion
           end
 
           def extract_profile(entry)
-            { first_name: :givenname, last_name: :sn, email: :mail, display_name: :displayname }
-              .transform_values { |attr| entry[attr]&.first&.to_s }
-              .compact
+            PROFILE_MAP.transform_values { |attr| entry[attr]&.first&.to_s }.compact
           end
         end
       end

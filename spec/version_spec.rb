@@ -4,6 +4,6 @@ require 'spec_helper'
 
 RSpec.describe Legion::Extensions::Kerberos do
   it 'has a version number' do
-    expect(Legion::Extensions::Kerberos::VERSION).to eq('0.1.1')
+    expect(Legion::Extensions::Kerberos::VERSION).to eq('0.1.2')
   end
 end

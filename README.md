@@ -86,9 +86,12 @@ result = client.authenticate(token: token)
 # => { success: true, principal: "user@EXAMPLE.COM", username: "user",
 #      realm: "EXAMPLE.COM", output_token: "...", ... }
 
-# Resolve LDAP groups for a username
+# Resolve LDAP groups and profile for a username
 groups = client.resolve_groups(username: 'user')
-# => { success: true, groups: ["CN=Domain Users,..."], username: "user" }
+# => { success: true, groups: ["CN=Domain Users,..."], username: "user",
+#      first_name: "Jane", last_name: "Doe", email: "jane.doe@example.com",
+#      title: "Senior Engineer", department: "Platform Engineering",
+#      company: "Acme Corp", city: "Minneapolis", state: "MN", country: "USA" }
 ```
 
 ### Using helpers directly
