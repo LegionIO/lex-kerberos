@@ -6,6 +6,7 @@ require 'legion/extensions/kerberos/helpers/keytab'
 require 'legion/extensions/kerberos/helpers/spnego'
 require 'legion/extensions/kerberos/helpers/client'
 require 'legion/extensions/kerberos/runners/authenticate'
+require 'legion/extensions/kerberos/actors/keytab_refresh' if defined?(Legion::Extensions::Actors)
 require 'legion/extensions/kerberos/client'
 
 module Legion
