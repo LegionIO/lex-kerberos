@@ -2,12 +2,13 @@
 
 ## [Unreleased]
 
-## [0.2.0] - 2026-03-17
-
-### Added
-- `Runners::Authenticate` with `validate_spnego` — full SPNEGO token validation pipeline: keytab resolution, GSSAPI token acceptance, optional LDAP group lookup, structured result with principal/username/realm/groups/output_token
-
 ## [0.1.0] - 2026-03-17
 
 ### Added
-- Initial gem scaffold
+- SPNEGO/GSSAPI token validation via `gssapi` gem (`Helpers::Spnego#accept_spnego_token`)
+- LDAP group resolution via `net-ldap` gem (`Helpers::Ldap#lookup_groups`) with configurable filter and attribute
+- Keytab management with Vault-primary, file-fallback resolution (`Helpers::Keytab#resolve_keytab`); supports `vault://` URIs, file paths, and Base64 blobs written to `~/.legionio/kerberos/legion.keytab`
+- Standalone `Client` class with `authenticate(token:)` and `resolve_groups(username:)` for framework-independent usage
+- `Runners::Authenticate#validate_spnego`: full pipeline combining keytab resolution, GSSAPI acceptance, and optional LDAP group lookup
+- `Actor::KeytabRefresh`: interval actor (hourly) that re-fetches and caches the keytab from configured sources
+- 43 specs, 91.67% coverage
