@@ -27,37 +27,30 @@ module Legion
                                          service_principal: service_principal)
             return { result: spnego } unless spnego[:success]
 
-            groups, ldap_error = resolve_groups(ldap: ldap, cfg: s, username: spnego[:username])
+            groups, ldap_error, profile = resolve_groups(ldap: ldap, cfg: s, username: spnego[:username])
 
-            { result: build_result(spnego: spnego, groups: groups, ldap_error: ldap_error) }
+            { result: build_result(spnego: spnego, groups: groups, ldap_error: ldap_error, profile: profile) }
           end
 
           private
 
           def resolve_groups(ldap:, cfg:, username:)
             ldap_opts = ldap || cfg[:ldap] || {}
-            if ldap_opts[:host]
-              groups_result = lookup_groups(username: username, **ldap_opts)
-              groups = groups_result[:success] ? groups_result[:groups] : []
-              ldap_error = groups_result[:success] ? nil : groups_result[:error]
+            return [[], nil, {}] unless ldap_opts[:host]
+
+            result = lookup_groups(username: username, **ldap_opts)
+            if result[:success]
+              profile = result.slice(:first_name, :last_name, :email, :display_name)
+              [result[:groups], nil, profile]
             else
-              groups = []
-              ldap_error = nil
+              [[], result[:error], {}]
             end
-            [groups, ldap_error]
           end
 
-          def build_result(spnego:, groups:, ldap_error:)
-            {
-              success: true,
-              principal: spnego[:principal],
-              username: spnego[:username],
-              realm: spnego[:realm],
-              groups: groups,
-              output_token: spnego[:output_token],
-              auth_method: 'kerberos',
-              ldap_error: ldap_error
-            }.compact
+          def build_result(spnego:, groups:, ldap_error:, profile: {})
+            spnego_fields = spnego.slice(:principal, :username, :realm, :output_token)
+            { success: true, groups: groups, auth_method: 'kerberos',
+              ldap_error: ldap_error, **spnego_fields, **profile }.compact
           end
 
           include Legion::Extensions::Helpers::Lex if Legion::Extensions.const_defined?(:Helpers) &&

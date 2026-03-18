@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-03-18
+
+### Added
+- LDAP user profile fetching: `givenName`, `sn`, `mail`, `displayName` attributes returned from `lookup_groups`
+- `first_name`, `last_name`, `email`, `display_name` fields in authenticate runner result
+
+### Changed
+- LDAP search now fetches `USER_ATTRIBUTES` constant (memberOf + profile fields) instead of just group attribute
+
 ## [0.1.0] - 2026-03-17
 
 ### Added

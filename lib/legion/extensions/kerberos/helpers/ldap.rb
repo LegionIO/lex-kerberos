@@ -7,6 +7,8 @@ module Legion
     module Kerberos
       module Helpers
         module Ldap
+          USER_ATTRIBUTES = %w[memberOf givenName sn mail displayName].freeze
+
           def lookup_groups(username:, host:, base_dn:, bind_dn:, bind_password:,
                             port: 636, encryption: :simple_tls,
                             user_filter: '(sAMAccountName=%<username>s)',
@@ -15,9 +17,8 @@ module Legion
                                      bind_dn: bind_dn, bind_password: bind_password)
             return { success: false, error: 'LDAP bind failed' } unless ldap.bind
 
-            groups = search_groups(ldap: ldap, username: username, base_dn: base_dn,
-                                   user_filter: user_filter, group_attribute: group_attribute)
-            { success: true, groups: groups, username: username }
+            search_user(ldap: ldap, username: username, base_dn: base_dn,
+                        user_filter: user_filter, group_attribute: group_attribute)
           rescue Net::LDAP::Error => e
             { success: false, error: "LDAP error: #{e.message}" }
           end
@@ -32,13 +33,21 @@ module Legion
             )
           end
 
-          def search_groups(ldap:, username:, base_dn:, user_filter:, group_attribute:)
+          def search_user(ldap:, username:, base_dn:, user_filter:, group_attribute:)
             filter = Net::LDAP::Filter.construct(format(user_filter, username: username))
             groups = []
-            ldap.search(base: base_dn, filter: filter, attributes: [group_attribute]) do |entry|
+            profile = {}
+            ldap.search(base: base_dn, filter: filter, attributes: USER_ATTRIBUTES) do |entry|
               groups.concat(Array(entry[group_attribute]).map(&:to_s))
+              profile = extract_profile(entry)
             end
-            groups
+            { success: true, groups: groups, username: username, **profile }
+          end
+
+          def extract_profile(entry)
+            { first_name: :givenname, last_name: :sn, email: :mail, display_name: :displayname }
+              .transform_values { |attr| entry[attr]&.first&.to_s }
+              .compact
           end
         end
       end
