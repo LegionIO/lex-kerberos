@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'legion/extensions/kerberos/version'
+require 'legion/extensions/kerberos/helpers/spnego'
 require 'legion/extensions/kerberos/helpers/ldap'
 require 'legion/extensions/kerberos/helpers/keytab'
-require 'legion/extensions/kerberos/helpers/spnego'
 require 'legion/extensions/kerberos/helpers/client'
 require 'legion/extensions/kerberos/runners/authenticate'
 require 'legion/extensions/kerberos/actors/keytab_refresh' if defined?(Legion::Extensions::Actors)

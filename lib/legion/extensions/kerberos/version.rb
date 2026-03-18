@@ -3,7 +3,7 @@
 module Legion
   module Extensions
     module Kerberos
-      VERSION = '0.3.0'
+      VERSION = '0.1.0'
     end
   end
 end
