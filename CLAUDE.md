@@ -10,16 +10,18 @@ Legion Extension that provides Kerberos/SPNEGO authentication. Validates SPNEGO 
 
 **GitHub**: https://github.com/LegionIO/lex-kerberos
 **License**: MIT
-**Version**: 0.1.2
+**Version**: 0.1.3
 
 ## Architecture
 
 ```
 Legion::Extensions::Kerberos
 ├── Runners/
-│   └── Authenticate      # validate_spnego: keytab resolve + GSSAPI accept + LDAP groups
+│   └── Authenticate      # validate_spnego + negotiate (HTTP Negotiate auth flow)
 ├── Actors/
 │   └── KeytabRefresh     # Every actor (1hr): re-fetch keytab from Vault/sources
+├── Hooks/
+│   └── Negotiate         # Hook class for /api/hooks/lex/kerberos/negotiate endpoint
 ├── Helpers/
 │   ├── Spnego            # GSSAPI token validation, principal/realm extraction
 │   ├── Ldap              # Net::LDAP group lookup via sAMAccountName filter
@@ -37,10 +39,11 @@ Legion::Extensions::Kerberos
 | `lib/legion/extensions/kerberos/helpers/ldap.rb` | LDAP group lookup + profile via `net-ldap`; `lookup_groups` returns groups + org attributes via `PROFILE_MAP` |
 | `lib/legion/extensions/kerberos/helpers/keytab.rb` | Multi-source keytab resolution; vault:// URI, file path, Base64 blob; writes to `~/.legionio/kerberos/legion.keytab` |
 | `lib/legion/extensions/kerberos/helpers/client.rb` | `DEFAULTS` constant and `settings` method that merges with `Legion::Settings[:kerberos]` |
-| `lib/legion/extensions/kerberos/runners/authenticate.rb` | `validate_spnego` runner: orchestrates keytab resolve → SPNEGO accept → optional LDAP lookup |
+| `lib/legion/extensions/kerberos/hooks/negotiate.rb` | Hook class auto-discovered by builders/hooks; routes all requests to `negotiate` runner method |
+| `lib/legion/extensions/kerberos/runners/authenticate.rb` | `validate_spnego` runner + `negotiate` (full HTTP Negotiate auth flow with response headers, RBAC mapping, JWT issuance) |
 | `lib/legion/extensions/kerberos/actors/keytab_refresh.rb` | Hourly actor that calls `resolve_keytab` to re-cache from Vault; `run_now? false` (no immediate run at boot) |
 | `lib/legion/extensions/kerberos/client.rb` | Standalone `Client` class with `authenticate(token:)` and `resolve_groups(username:)` |
-| `lib/legion/extensions/kerberos/version.rb` | `VERSION = '0.1.2'` |
+| `lib/legion/extensions/kerberos/version.rb` | `VERSION = '0.1.3'` |
 
 ## Key Patterns
 
@@ -113,7 +116,7 @@ Optional framework dependencies (guarded with `defined?`, not in gemspec):
 
 ```bash
 bundle install
-bundle exec rspec     # 43 specs across 8 spec files, 91.67% coverage
+bundle exec rspec     # 57 specs across 10 spec files
 bundle exec rubocop   # Clean
 ```
 
