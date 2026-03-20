@@ -91,7 +91,7 @@ groups = client.resolve_groups(username: 'user')
 # => { success: true, groups: ["CN=Domain Users,..."], username: "user",
 #      first_name: "Jane", last_name: "Doe", email: "jane.doe@example.com",
 #      title: "Senior Engineer", department: "Platform Engineering",
-#      company: "Acme Corp", city: "Minneapolis", state: "MN", country: "USA" }
+#      company: "Example Corp", city: "Minneapolis", state: "MN", country: "USA" }
 ```
 
 ### Using helpers directly
@@ -121,10 +121,10 @@ This uses the configured service principal and keytab to authenticate via Vault'
 
 ## API Usage
 
-When the LegionIO REST API is running, the Negotiate challenge/response endpoint is available:
+When the LegionIO REST API is running, the Negotiate challenge/response endpoint is available via the auto-discovered hook:
 
 ```
-GET /api/auth/negotiate
+GET /api/hooks/lex/kerberos/negotiate
 Authorization: Negotiate <base64-spnego-token>
 ```
 
