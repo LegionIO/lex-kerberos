@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-03-19
+
+### Added
+- `Hooks::Negotiate` hook class for Kerberos SPNEGO authentication via expanded hooks system
+- `Runners::Authenticate#negotiate` method handling full HTTP Negotiate flow with custom response
+- RBAC role mapping and JWT token issuance (guarded, requires LegionIO framework)
+- Negotiate endpoint now routes through `Ingress.run` for RBAC and audit support
+
+### Changed
+- Kerberos negotiate endpoint moves from hardcoded `/api/auth/negotiate` in LegionIO to `/api/hooks/lex/kerberos/negotiate`
+
 ## [0.1.2] - 2026-03-18
 
 ### Added
