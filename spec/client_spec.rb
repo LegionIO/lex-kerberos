@@ -66,6 +66,6 @@ RSpec.describe Legion::Extensions::Kerberos::Client do
     it { expect(client).to respond_to(:accept_spnego_token) }
     it { expect(client).to respond_to(:lookup_groups) }
     it { expect(client).to respond_to(:resolve_keytab) }
-    it { expect(client).to respond_to(:settings) }
+    it { expect(client).to respond_to(:kerberos_defaults) }
   end
 end

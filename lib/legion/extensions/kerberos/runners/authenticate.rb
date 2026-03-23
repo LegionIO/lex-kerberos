@@ -16,7 +16,7 @@ module Legion
           include Helpers::Client
 
           def validate_spnego(token:, keytab: nil, service_principal: nil, ldap: nil, **)
-            s = settings[:kerberos]
+            s = kerberos_defaults[:kerberos]
             keytab ||= s[:keytab]
             service_principal ||= s[:service_principal]
 

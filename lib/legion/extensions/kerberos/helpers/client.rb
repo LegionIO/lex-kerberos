@@ -23,7 +23,7 @@ module Legion
             }
           }.freeze
 
-          def settings
+          def kerberos_defaults
             if defined?(Legion::Settings) && Legion::Settings.respond_to?(:dig)
               krb = Legion::Settings[:kerberos] || {}
               { kerberos: DEFAULTS[:kerberos].merge(krb) }

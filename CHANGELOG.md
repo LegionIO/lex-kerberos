@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-03-22
+
+### Changed
+- Add legion-cache, legion-crypt, legion-data, legion-json, legion-logging, legion-settings, legion-transport as runtime dependencies
+- Rename `Helpers::Client#settings` to `kerberos_defaults` to avoid collision with `Legion::Settings::Helper#settings` from injected Lex helper
+- Update spec_helper with real sub-gem helper requires and Helpers::Lex stub (all 7 includes)
+
 ## [0.1.3] - 2026-03-19
 
 ### Added

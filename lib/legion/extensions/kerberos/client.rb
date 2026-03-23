@@ -17,7 +17,7 @@ module Legion
         attr_reader :realm, :service_principal, :keytab_sources, :opts
 
         def initialize(realm: nil, service_principal: nil, keytab: nil, **opts)
-          defaults = settings[:kerberos]
+          defaults = kerberos_defaults[:kerberos]
           @realm = realm || defaults[:realm]
           @service_principal = service_principal || defaults[:service_principal]
           @keytab_sources = keytab || defaults[:keytab]
@@ -36,7 +36,7 @@ module Legion
         end
 
         def resolve_groups(username:)
-          ldap_opts = @opts[:ldap] || settings[:kerberos][:ldap] || {}
+          ldap_opts = @opts[:ldap] || kerberos_defaults[:kerberos][:ldap] || {}
           lookup_groups(username: username, **ldap_opts)
         end
       end
