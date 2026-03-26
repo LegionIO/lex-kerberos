@@ -10,7 +10,7 @@ Legion Extension that provides Kerberos/SPNEGO authentication. Validates SPNEGO 
 
 **GitHub**: https://github.com/LegionIO/lex-kerberos
 **License**: MIT
-**Version**: 0.1.3
+**Version**: 0.1.6
 
 ## Architecture
 
@@ -35,7 +35,7 @@ Legion::Extensions::Kerberos
 | File | Purpose |
 |------|---------|
 | `lib/legion/extensions/kerberos.rb` | Entry point, requires all helpers/runners/actors, extends Core |
-| `lib/legion/extensions/kerberos/helpers/spnego.rb` | GSSAPI token acceptance via `gssapi` gem; `accept_spnego_token`, `extract_username`, `extract_realm` |
+| `lib/legion/extensions/kerberos/helpers/spnego.rb` | GSSAPI token acceptance and acquisition via `gssapi` gem; `accept_spnego_token`, `obtain_spnego_token`, `extract_username`, `extract_realm`; macOS Heimdal segfault fix via `disable_gssapi_finalizers` |
 | `lib/legion/extensions/kerberos/helpers/ldap.rb` | LDAP group lookup + profile via `net-ldap`; `lookup_groups` returns groups + org attributes via `PROFILE_MAP` |
 | `lib/legion/extensions/kerberos/helpers/keytab.rb` | Multi-source keytab resolution; vault:// URI, file path, Base64 blob; writes to `~/.legionio/kerberos/legion.keytab` |
 | `lib/legion/extensions/kerberos/helpers/client.rb` | `DEFAULTS` constant and `settings` method that merges with `Legion::Settings[:kerberos]` |
@@ -43,7 +43,7 @@ Legion::Extensions::Kerberos
 | `lib/legion/extensions/kerberos/runners/authenticate.rb` | `validate_spnego` runner + `negotiate` (full HTTP Negotiate auth flow with response headers, RBAC mapping, JWT issuance) |
 | `lib/legion/extensions/kerberos/actors/keytab_refresh.rb` | Hourly actor that calls `resolve_keytab` to re-cache from Vault; `run_now? false` (no immediate run at boot) |
 | `lib/legion/extensions/kerberos/client.rb` | Standalone `Client` class with `authenticate(token:)` and `resolve_groups(username:)` |
-| `lib/legion/extensions/kerberos/version.rb` | `VERSION = '0.1.3'` |
+| `lib/legion/extensions/kerberos/version.rb` | `VERSION = '0.1.6'` |
 
 ## Key Patterns
 
