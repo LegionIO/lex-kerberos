@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-03-26
+
+### Fixed
+- Move `disable_gssapi_finalizers` to `ensure` block in `init_spnego_context` and `negotiate` so finalizers are disabled even when GSSAPI operations fail (e.g., expired Kerberos credentials), preventing segfault in `gss_release_name` during later GC
+
 ## [0.1.6] - 2026-03-26
 
 ### Fixed

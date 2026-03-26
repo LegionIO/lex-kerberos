@@ -48,9 +48,12 @@ module Legion
             token_bytes = ctx.init_context
             raise GSSAPI::GssApiError, 'init_context returned nil token' if token_bytes.nil?
 
-            # Prevent macOS Heimdal segfault in gss_release_name during GC (FFI autopointer finalizer).
-            disable_gssapi_finalizers(ctx) if RUBY_PLATFORM.include?('darwin')
             token_bytes
+          ensure
+            # Prevent macOS Heimdal segfault in gss_release_name during GC (FFI autopointer finalizer).
+            # Must run in ensure so finalizers are disabled even when init_context fails
+            # (e.g., expired Kerberos credentials).
+            disable_gssapi_finalizers(ctx) if ctx && RUBY_PLATFORM.include?('darwin')
           end
 
           def disable_gssapi_finalizers(ctx)
@@ -67,6 +70,8 @@ module Legion
             ctx.acquire_credentials
             output_bytes = ctx.accept_context(input_bytes)
             [ctx.display_name, output_bytes]
+          ensure
+            disable_gssapi_finalizers(ctx) if ctx && RUBY_PLATFORM.include?('darwin')
           end
 
           def build_token_result(principal, output_bytes)

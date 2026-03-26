@@ -105,6 +105,14 @@ RSpec.describe Legion::Extensions::Kerberos::Helpers::Spnego do
         expect(result[:success]).to be false
         expect(result[:error]).to include('No credentials cache')
       end
+
+      it 'disables GSSAPI finalizers even on failure to prevent segfault' do
+        stub_const('RUBY_PLATFORM', 'arm64-darwin23')
+        ptr = double('autopointer', autorelease: true, 'autorelease=': nil)
+        allow(mock_context).to receive(:instance_variable_get).and_return(ptr)
+        dummy.obtain_spnego_token(service_principal: 'HTTP/vault.example.com')
+        expect(ptr).to have_received(:autorelease=).with(false).at_least(:once)
+      end
     end
 
     context 'with a malformed service principal missing /' do
