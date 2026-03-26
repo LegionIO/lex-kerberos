@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-03-25
+
+### Added
+- `Helpers::Spnego#obtain_spnego_token(service_principal:)` client-side method for generating outbound SPNEGO tokens to authenticate against services (e.g., Vault); splits service principal on `/`, creates a `GSSAPI::Simple` context, and returns `{ success: true, token: }` with Base64-encoded token or `{ success: false, error: }` on GSSAPI failure
+
 ## [0.1.4] - 2026-03-22
 
 ### Changed

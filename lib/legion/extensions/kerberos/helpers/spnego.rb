@@ -29,6 +29,15 @@ module Legion
             parts.length > 1 ? parts.last : nil
           end
 
+          def obtain_spnego_token(service_principal:)
+            service, host = service_principal.split('/', 2)
+            ctx = GSSAPI::Simple.new(host, service)
+            token_bytes = ctx.init_context
+            { success: true, token: Base64.strict_encode64(token_bytes) }
+          rescue GSSAPI::GssApiError => e
+            { success: false, error: e.message }
+          end
+
           private
 
           def negotiate(input_bytes, service_principal)

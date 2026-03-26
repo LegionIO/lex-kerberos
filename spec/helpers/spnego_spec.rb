@@ -76,4 +76,35 @@ RSpec.describe Legion::Extensions::Kerberos::Helpers::Spnego do
       expect(dummy.extract_realm('miverso2')).to be_nil
     end
   end
+
+  describe '#obtain_spnego_token' do
+    context 'with a valid service principal' do
+      before do
+        allow(mock_context).to receive(:init_context).and_return('spnego-output-bytes')
+      end
+
+      it 'returns success with a base64-encoded token' do
+        result = dummy.obtain_spnego_token(service_principal: 'HTTP/vault.example.com')
+        expect(result[:success]).to be true
+        expect(result[:token]).to eq(Base64.strict_encode64('spnego-output-bytes'))
+      end
+
+      it 'splits service_principal and passes host and service to GSSAPI::Simple' do
+        expect(GSSAPI::Simple).to receive(:new).with('vault.example.com', 'HTTP').and_return(mock_context)
+        dummy.obtain_spnego_token(service_principal: 'HTTP/vault.example.com')
+      end
+    end
+
+    context 'when GSSAPI raises an error' do
+      before do
+        allow(mock_context).to receive(:init_context).and_raise(GSSAPI::GssApiError.new('No credentials cache'))
+      end
+
+      it 'returns failure with the error message' do
+        result = dummy.obtain_spnego_token(service_principal: 'HTTP/vault.example.com')
+        expect(result[:success]).to be false
+        expect(result[:error]).to include('No credentials cache')
+      end
+    end
+  end
 end
