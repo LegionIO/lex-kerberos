@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-03-26
+
+### Fixed
+- macOS Heimdal segfault: disable FFI autorelease on `@int_svc_name`, `@context`, `@scred` after obtaining SPNEGO token to prevent `gss_release_name` crash during GC
+
+### Changed
+- Extract `init_spnego_context` private method from `obtain_spnego_token` for clarity
+
 ## [0.1.5] - 2026-03-25
 
 ### Added

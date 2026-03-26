@@ -34,17 +34,32 @@ module Legion
               return { success: false, error: "service_principal must contain '/'" }
             end
 
-            service, host = service_principal.split('/', 2)
-            ctx = GSSAPI::Simple.new(host, service)
-            token_bytes = ctx.init_context
-            raise GSSAPI::GssApiError, 'init_context returned nil token' if token_bytes.nil?
-
+            token_bytes = init_spnego_context(service_principal)
             { success: true, token: Base64.strict_encode64(token_bytes) }
           rescue GSSAPI::GssApiError => e
             { success: false, error: e.message }
           end
 
           private
+
+          def init_spnego_context(service_principal)
+            service, host = service_principal.split('/', 2)
+            ctx = GSSAPI::Simple.new(host, service)
+            token_bytes = ctx.init_context
+            raise GSSAPI::GssApiError, 'init_context returned nil token' if token_bytes.nil?
+
+            # Prevent macOS Heimdal segfault in gss_release_name during GC (FFI autopointer finalizer).
+            disable_gssapi_finalizers(ctx) if RUBY_PLATFORM.include?('darwin')
+            token_bytes
+          end
+
+          def disable_gssapi_finalizers(ctx)
+            %i[@int_svc_name @context @scred].each do |ivar|
+              ptr = ctx.instance_variable_get(ivar)
+              ptr.autorelease = false if ptr.respond_to?(:autorelease=)
+            end
+          rescue StandardError # rubocop:disable Lint/SuppressedException
+          end
 
           def negotiate(input_bytes, service_principal)
             service, host = service_principal.split('/', 2)
