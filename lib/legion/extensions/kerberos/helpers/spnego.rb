@@ -30,9 +30,15 @@ module Legion
           end
 
           def obtain_spnego_token(service_principal:)
+            unless service_principal.include?('/')
+              return { success: false, error: "service_principal must contain '/'" }
+            end
+
             service, host = service_principal.split('/', 2)
             ctx = GSSAPI::Simple.new(host, service)
             token_bytes = ctx.init_context
+            raise GSSAPI::GssApiError, 'init_context returned nil token' if token_bytes.nil?
+
             { success: true, token: Base64.strict_encode64(token_bytes) }
           rescue GSSAPI::GssApiError => e
             { success: false, error: e.message }

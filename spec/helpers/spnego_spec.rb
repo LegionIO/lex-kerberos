@@ -106,5 +106,26 @@ RSpec.describe Legion::Extensions::Kerberos::Helpers::Spnego do
         expect(result[:error]).to include('No credentials cache')
       end
     end
+
+    context 'with a malformed service principal missing /' do
+      it 'returns failure without calling GSSAPI' do
+        result = dummy.obtain_spnego_token(service_principal: 'HTTP-vault.example.com')
+        expect(result[:success]).to be false
+        expect(result[:error]).to include("must contain '/'")
+        expect(GSSAPI::Simple).not_to have_received(:new)
+      end
+    end
+
+    context 'when init_context returns nil' do
+      before do
+        allow(mock_context).to receive(:init_context).and_return(nil)
+      end
+
+      it 'returns failure with nil token error' do
+        result = dummy.obtain_spnego_token(service_principal: 'HTTP/vault.example.com')
+        expect(result[:success]).to be false
+        expect(result[:error]).to include('init_context returned nil token')
+      end
+    end
   end
 end
