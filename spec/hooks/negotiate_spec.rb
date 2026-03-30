@@ -17,7 +17,7 @@ unless defined?(Legion::Extensions::Hooks::Base)
             :handle
           end
 
-          def verify(_headers, _body) # rubocop:disable Naming/PredicateMethod
+          def verify(_headers, _body)
             true
           end
         end

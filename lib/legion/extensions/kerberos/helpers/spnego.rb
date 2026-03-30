@@ -30,9 +30,7 @@ module Legion
           end
 
           def obtain_spnego_token(service_principal:)
-            unless service_principal.include?('/')
-              return { success: false, error: "service_principal must contain '/'" }
-            end
+            return { success: false, error: "service_principal must contain '/'" } unless service_principal.include?('/')
 
             token_bytes = init_spnego_context(service_principal)
             { success: true, token: Base64.strict_encode64(token_bytes) }
@@ -61,7 +59,7 @@ module Legion
               ptr = ctx.instance_variable_get(ivar)
               ptr.autorelease = false if ptr.respond_to?(:autorelease=)
             end
-          rescue StandardError # rubocop:disable Lint/SuppressedException
+          rescue StandardError => _e # rubocop:disable Lint/SuppressedException
           end
 
           def negotiate(input_bytes, service_principal)
@@ -76,11 +74,11 @@ module Legion
 
           def build_token_result(principal, output_bytes)
             {
-              success: true,
-              principal: principal,
+              success:      true,
+              principal:    principal,
               output_token: output_bytes ? Base64.strict_encode64(output_bytes) : nil,
-              username: extract_username(principal),
-              realm: extract_realm(principal)
+              username:     extract_username(principal),
+              realm:        extract_realm(principal)
             }
           end
         end
