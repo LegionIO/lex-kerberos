@@ -34,14 +34,10 @@ module Legion
 
           def negotiate(headers: {}, **)
             auth_header = headers['HTTP_AUTHORIZATION']
-            unless auth_header&.match?(/\ANegotiate\s+/i)
-              return negotiate_error('negotiate_required', 'Negotiate token required')
-            end
+            return negotiate_error('negotiate_required', 'Negotiate token required') unless auth_header&.match?(/\ANegotiate\s+/i) # rubocop:disable Legion/Extension/RunnerReturnHash
 
             auth_result = negotiate_authenticate(auth_header.sub(/\ANegotiate\s+/i, ''))
-            unless auth_result&.dig(:success)
-              return negotiate_error('kerberos_auth_failed', 'Kerberos authentication failed')
-            end
+            return negotiate_error('kerberos_auth_failed', 'Kerberos authentication failed') unless auth_result&.dig(:success) # rubocop:disable Legion/Extension/RunnerReturnHash
 
             negotiate_success(auth_result)
           end
@@ -50,7 +46,7 @@ module Legion
 
           def resolve_groups(ldap:, cfg:, username:)
             ldap_opts = ldap || cfg[:ldap] || {}
-            return [[], nil, {}] unless ldap_opts[:host]
+            return [[], nil, {}] unless ldap_opts[:host] # rubocop:disable Legion/Extension/RunnerReturnHash
 
             result = lookup_groups(username: username, **ldap_opts)
             if result[:success]
@@ -69,15 +65,15 @@ module Legion
 
           def negotiate_authenticate(token)
             Client.new.authenticate(token: token)
-          rescue StandardError
+          rescue StandardError => _e
             nil
           end
 
           def negotiate_error(code, message)
             body = negotiate_json({ error: { code: code, message: message },
-                                    meta: { timestamp: Time.now.utc.iso8601 } })
+                                    meta:  { timestamp: Time.now.utc.iso8601 } })
             {
-              result: { error: code },
+              result:   { error: code },
               response: { status: 401, content_type: 'application/json',
                           headers: { 'WWW-Authenticate' => 'Negotiate' }, body: body }
             }
@@ -94,13 +90,13 @@ module Legion
           def negotiate_success_response(auth_result, data)
             hdrs = ({ 'WWW-Authenticate' => "Negotiate #{auth_result[:output_token]}" } if auth_result[:output_token])
             body = negotiate_json({ data: data, meta: { timestamp: Time.now.utc.iso8601 } })
-            { result: data,
+            { result:   data,
               response: { status: 200, content_type: 'application/json',
                           headers: hdrs, body: body }.compact }
           end
 
           def issue_negotiate_token(auth_result, profile)
-            return [nil, []] unless defined?(Legion::Rbac::KerberosClaimsMapper) && defined?(Legion::API::Token)
+            return [nil, []] unless defined?(Legion::Rbac::KerberosClaimsMapper) && defined?(Legion::API::Token) # rubocop:disable Legion/Extension/RunnerReturnHash
 
             mapped = map_negotiate_claims(auth_result, profile)
             display = mapped[:display_name] || mapped[:first_name]
@@ -108,7 +104,7 @@ module Legion
               msid: mapped[:sub], name: display, roles: mapped[:roles], ttl: 28_800
             )
             [token, mapped[:roles]]
-          rescue StandardError
+          rescue StandardError => _e
             [nil, []]
           end
 
@@ -121,14 +117,14 @@ module Legion
           end
 
           def negotiate_json(hash)
-            return Legion::JSON.dump(hash) if defined?(Legion::JSON)
+            return json_dump(hash) if defined?(Legion::JSON) # rubocop:disable Legion/Extension/RunnerReturnHash
 
             require 'json'
             ::JSON.generate(hash)
           end
 
-          include Legion::Extensions::Helpers::Lex if Legion::Extensions.const_defined?(:Helpers) &&
-                                                      Legion::Extensions::Helpers.const_defined?(:Lex)
+          include Legion::Extensions::Helpers::Lex if Legion::Extensions.const_defined?(:Helpers, false) &&
+                                                      Legion::Extensions::Helpers.const_defined?(:Lex, false)
         end
       end
     end

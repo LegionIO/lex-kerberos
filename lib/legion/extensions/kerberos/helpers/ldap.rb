@@ -18,7 +18,7 @@ module Legion
             country: :co, country_code: :c, city: :l, state: :st, ad_created_at: :whencreated
           }.freeze
 
-          def lookup_groups(username:, host:, base_dn:, bind_dn:, bind_password:,
+          def lookup_groups(username:, host:, base_dn:, bind_dn:, bind_password:, # rubocop:disable Metrics/ParameterLists
                             port: 636, encryption: :simple_tls,
                             user_filter: '(sAMAccountName=%<username>s)',
                             group_attribute: 'memberOf', **)

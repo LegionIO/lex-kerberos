@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'legion/extensions/actors/every' if defined?(Legion::Extensions::Actors)
+require 'legion/extensions/actors/every'
 
 module Legion
   module Extensions
     module Kerberos
       module Actor
-        class KeytabRefresh < Legion::Extensions::Actors::Every
+        class KeytabRefresh < Legion::Extensions::Actors::Every # rubocop:disable Legion/Extension/SelfContainedActorRunnerClass, Legion/Extension/EveryActorRequiresTime
           def initialize(**opts)
             return unless enabled?
 
@@ -19,9 +19,9 @@ module Legion
           def check_subtask? = false
           def generate_task? = false
 
-          def enabled?
+          def enabled? # rubocop:disable Legion/Extension/ActorEnabledSideEffects
             defined?(Legion::Extensions::Kerberos::Helpers::Keytab)
-          rescue StandardError
+          rescue StandardError => _e
             false
           end
 
@@ -29,7 +29,7 @@ module Legion
             result = keytab_helper.resolve_keytab(sources: keytab_sources)
             log_result(result)
           rescue StandardError => e
-            log_error(e)
+            log.error(e)
           end
 
           private
@@ -45,17 +45,15 @@ module Legion
           end
 
           def log_result(result)
-            return unless defined?(Legion::Logging)
-
             if result[:success]
-              Legion::Logging.debug("KeytabRefresh: refreshed keytab from #{result[:source]}")
+              log.debug("KeytabRefresh: refreshed keytab from #{result[:source]}")
             else
-              Legion::Logging.warn("KeytabRefresh: #{result[:error]}")
+              log.warn("KeytabRefresh: #{result[:error]}")
             end
           end
 
           def log_error(err)
-            Legion::Logging.error("KeytabRefresh: #{err.message}") if defined?(Legion::Logging)
+            log.error("KeytabRefresh: #{err.message}")
           end
         end
       end

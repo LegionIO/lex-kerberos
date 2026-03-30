@@ -7,19 +7,19 @@ module Legion
         module Client
           DEFAULTS = {
             kerberos: {
-              enabled: true,
-              realm: 'MS.DS.UHC.COM',
+              enabled:           true,
+              realm:             'MS.DS.UHC.COM',
               service_principal: 'HTTP/legion.uhg.com',
-              keytab: ['/etc/legion/krb5.keytab'],
-              mutual_auth: true,
-              ldap: {
+              keytab:            ['/etc/legion/krb5.keytab'],
+              mutual_auth:       true,
+              ldap:              {
                 port: 636, encryption: :simple_tls,
                 group_attribute: 'memberOf',
                 user_filter: '(sAMAccountName=%<username>s)'
               },
-              role_map: {},
-              fallback: :entra,
-              cache_groups_ttl: 300
+              role_map:          {},
+              fallback:          :entra,
+              cache_groups_ttl:  300
             }
           }.freeze
 

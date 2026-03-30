@@ -27,10 +27,10 @@ RSpec.describe Legion::Extensions::Kerberos::Runners::Authenticate do
   describe '#validate_spnego' do
     it 'validates a SPNEGO token and returns principal with groups' do
       result = dummy.validate_spnego(
-        token: 'fake-token',
-        keytab: ['/tmp/test.keytab'],
+        token:             'fake-token',
+        keytab:            ['/tmp/test.keytab'],
         service_principal: 'HTTP/legion.uhg.com',
-        ldap: { host: 'ldap.example.com', base_dn: 'DC=example,DC=com',
+        ldap:              { host: 'ldap.example.com', base_dn: 'DC=example,DC=com',
                 bind_dn: 'CN=svc', bind_password: 'secret' }
       )
       expect(result[:result][:principal]).to eq('miverso2@MS.DS.UHC.COM')
@@ -74,10 +74,10 @@ RSpec.describe Legion::Extensions::Kerberos::Runners::Authenticate do
 
       it 'returns principal with empty groups and ldap_error' do
         result = dummy.validate_spnego(
-          token: 'fake-token',
-          keytab: ['/tmp/test.keytab'],
+          token:             'fake-token',
+          keytab:            ['/tmp/test.keytab'],
           service_principal: 'HTTP/legion.uhg.com',
-          ldap: { host: 'ldap.example.com', base_dn: 'DC=example,DC=com',
+          ldap:              { host: 'ldap.example.com', base_dn: 'DC=example,DC=com',
                   bind_dn: 'CN=svc', bind_password: 'secret' }
         )
         expect(result[:result][:principal]).to eq('miverso2@MS.DS.UHC.COM')
@@ -89,10 +89,10 @@ RSpec.describe Legion::Extensions::Kerberos::Runners::Authenticate do
     context 'when no LDAP host configured' do
       it 'skips LDAP and returns empty groups' do
         result = dummy.validate_spnego(
-          token: 'fake-token',
-          keytab: ['/tmp/test.keytab'],
+          token:             'fake-token',
+          keytab:            ['/tmp/test.keytab'],
           service_principal: 'HTTP/legion.uhg.com',
-          ldap: {}
+          ldap:              {}
         )
         expect(result[:result][:groups]).to be_empty
         expect(result[:result][:success]).to be true

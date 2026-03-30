@@ -29,8 +29,8 @@ module Legion
           return kt unless kt[:success]
 
           accept_spnego_token(
-            token: token,
-            keytab: kt[:path],
+            token:             token,
+            keytab:            kt[:path],
             service_principal: @service_principal
           )
         end
